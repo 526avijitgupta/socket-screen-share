@@ -2,10 +2,12 @@ import socket
 import thread
 from Tkinter import *
 
+keysArr = []
+
 def keyEvent(event):
-    # keysArr = []
+    global keysArr
     print event.keysym
-    # keysArr += [event.keysym]
+    keysArr += [event.keysym]
     # print keysArr
     return event.keysym
 
@@ -19,7 +21,7 @@ def socket_server(socket):
         # print keysArr
         # while len(keysArr) > 0:
         # conn.send(keysArr.pop())
-        conn.send('Hello')    
+        conn.send(''.join(keysArr))
         # print "Connection received"
         conn.close()
 
