@@ -12,6 +12,7 @@ def keyEvent(event):
     return event.keysym
 
 def socket_server(socket):
+    global keysArr
     while True:
         print "Serving on localhost"
 	print keysArr
@@ -22,7 +23,9 @@ def socket_server(socket):
         # print keysArr
         # while len(keysArr) > 0:
         # conn.send(keysArr.pop())
-        conn.send(''.join(keysArr))
+        if len(keysArr):
+            conn.send(''.join(keysArr))
+            keysArr = []
 	# conn.send('Hello')
         # print "Connection received"
         conn.close()
