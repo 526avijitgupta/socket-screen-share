@@ -14,6 +14,7 @@ def keyEvent(event):
 def socket_server(socket):
     while True:
         print "Serving on localhost"
+	print keysArr
         # main.mainloop()
         # sleep(2)
         conn, addr = socket.accept()
@@ -22,6 +23,7 @@ def socket_server(socket):
         # while len(keysArr) > 0:
         # conn.send(keysArr.pop())
         conn.send(''.join(keysArr))
+	# conn.send('Hello')
         # print "Connection received"
         conn.close()
 
