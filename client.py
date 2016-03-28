@@ -3,7 +3,7 @@ import sys
 from time import sleep
 
 HOST = 'localhost'
-PORT = 4500
+PORT = 4501
 
 while True:
     sock = socket.socket()

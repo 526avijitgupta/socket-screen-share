@@ -1,46 +1,67 @@
 import socket
 import thread
 from Tkinter import *
+from time import sleep
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Pango
 
-keysArr = []
+class TextViewWindow(Gtk.Window):
 
-def keyEvent(event):
-    global keysArr
-    print event.keysym
-    keysArr += [event.keysym]
-    return event.keysym
+    def __init__(self):
+        Gtk.Window.__init__(self, title="TextView Example")
 
-def socket_server(socket):
-    global keysArr
+        self.set_default_size(350, 350)
+
+        self.grid = Gtk.Grid()
+        self.add(self.grid)
+        self.scrolledwindow = Gtk.ScrolledWindow()
+
+        self.create_textview()
+
+    def create_textview(self):
+        self.scrolledwindow.set_hexpand(True)
+        self.scrolledwindow.set_vexpand(True)
+        self.grid.attach(self.scrolledwindow, 0, 1, 3, 1)
+
+        self.textview = Gtk.TextView()
+        self.textbuffer = self.textview.get_buffer()
+        self.textbuffer.set_text("This is some text inside of a Gtk.TextView. "
+            + "Select text and click one of the buttons 'bold', 'italic', "
+            + "or 'underline' to modify the text accordingly.")
+        self.scrolledwindow.add(self.textview)
+
+    def get_val(self):
+        start_iter = self.textbuffer.get_start_iter()
+        end_iter = self.textbuffer.get_end_iter()
+        return self.textbuffer.get_text(start_iter, end_iter, True) or None
+
+    def on_editable_toggled(self, widget):
+        self.textview.set_editable(widget.get_active())
+
+
+def socket_server(socket, win):
     while True:
         print "Serving on localhost"
-	print keysArr
         conn, addr = socket.accept()
-        if len(keysArr):
-            conn.send(''.join(keysArr))
-            keysArr = []
+        if win.get_val():
+            conn.send(win.get_val())
         conn.close()
 
 if __name__ == "__main__":
 
-    main = Tk()
-    frame = Frame(main, width=500, height=500)
-    Label(main, text="Code").grid(row=0)
-    key = main.bind('<Key>', keyEvent)
+    win = TextViewWindow()
+    win.connect("delete-event", Gtk.main_quit)
+    win.show_all()
+    print win.get_val()
 
-    print 'hello'
-    e1 = Entry(main)
-    e2 = Entry(main)
-
-    e1.grid(row=0, column=1)
-    e1.grid(row=1, column=1)
     socket = socket.socket()
     HOST = 'localhost'
-    PORT = 4500
+    PORT = 4501
 
     socket.bind((HOST, PORT))
     socket.listen(3)
 
-    thread.start_new_thread(socket_server, (socket,))
-    
-    main.mainloop()
+    thread.start_new_thread(socket_server, (socket, win))
+    Gtk.main()
+

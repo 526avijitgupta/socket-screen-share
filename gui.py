@@ -15,7 +15,6 @@ class TextViewWindow(Gtk.Window):
         self.scrolledwindow = Gtk.ScrolledWindow()
 
         self.create_textview()
-        # self.create_button()
 
     def create_textview(self):
         self.scrolledwindow.set_hexpand(True)
