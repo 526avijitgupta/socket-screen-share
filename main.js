@@ -10,19 +10,19 @@ $(document).ready(function() {
 	    console.log('Sending Value');
 	    s.send(value);
 	}
-  });
+    });
 
-        s.onopen = function() { 
-            console.log('Onload');
-	    isConSet = true;
-          s.send('message sent from client'); 
-         };
-        
-         s.onclose = function(error) {
-          console.log('Websocket error ' + error);
-         };
-
-         s.onmessage = function(e) {
-         	console.log('Server ' + e.data);
-         };
+    s.onopen = function() { 
+        console.log('Onload');
+	isConSet = true;
+    };
+    
+    s.onclose = function(error) {
+        console.log('Websocket error ' + error);
+    };
+    
+    s.onmessage = function(e) {
+        console.log('Server ' + e.data);
+	text.val(e.data);
+    };
 });
