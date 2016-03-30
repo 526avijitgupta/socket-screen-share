@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Web Socket Example</title>
+    <meta charset="UTF-8">
+    <script>
+      window.onload = function() {
+        var s = new WebSocket("ws://localhost:4502/");
+
+        s.onopen = function() { 
+          console.log('Onload');
+          s.send('message sent from client'); 
+         };
+        
+         s.onclose = function(error) {
+          console.log('Websocket error ' + error);
+         };
+
+         s.onmessage = function(e) {
+         	console.log('Server ' + e.data);
+         };
+      };
+    </script>
+  </head>
+    <body>
+      <div id="holder" style="width:600px; height:300px"></div>
+    </body>
+</html>

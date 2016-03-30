@@ -26,15 +26,12 @@ class TextViewWindow(Gtk.Window):
 
         self.textview = Gtk.TextView()
         self.textbuffer = self.textview.get_buffer()
-        self.textbuffer.set_text("This is some text inside of a Gtk.TextView. "
-            + "Select text and click one of the buttons 'bold', 'italic', "
-            + "or 'underline' to modify the text accordingly.")
         self.scrolledwindow.add(self.textview)
 
     def get_val(self):
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
-        return self.textbuffer.get_text(start_iter, end_iter, True) or None
+        return self.textbuffer.get_text(start_iter, end_iter, False)
 
     def on_editable_toggled(self, widget):
         self.textview.set_editable(widget.get_active())
@@ -42,11 +39,12 @@ class TextViewWindow(Gtk.Window):
 
 def socket_server(socket, win):
     while True:
-        print "Serving on localhost"
-        conn, addr = socket.accept()
-        if win.get_val():
-            conn.send(win.get_val())
-        conn.close()
+        textValue = win.get_val()
+        #conn, addr = socket.accept()
+        if textValue:
+            print textValue
+            #conn.send(win.get_val())
+        #conn.close()
 
 if __name__ == "__main__":
 
@@ -57,7 +55,7 @@ if __name__ == "__main__":
 
     socket = socket.socket()
     HOST = 'localhost'
-    PORT = 4501
+    PORT = 4500
 
     socket.bind((HOST, PORT))
     socket.listen(3)
