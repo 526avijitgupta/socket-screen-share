@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var PORT = 4501
+    var PORT = 4500
     var s = new WebSocket("ws://localhost:" + PORT + "/");
     var text = $('#text');
     var isConSet = false;
