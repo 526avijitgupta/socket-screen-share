@@ -1,0 +1,6 @@
+$(document).ready(function() {
+  var text = $('#text');
+  text.on('input', function() {
+    console.log(text.val());
+  });
+});

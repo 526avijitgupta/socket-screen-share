@@ -8,7 +8,7 @@ HSHAKE_RESP = "HTTP/1.1 101 Switching Protocols\r\n" + \
             "\r\n"
 
 HOST = ''
-PORT = 4502
+PORT = 4501
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 s.listen(5)
