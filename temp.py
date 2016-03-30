@@ -6,7 +6,7 @@ HSHAKE_RESP = "HTTP/1.1 101 Switching Protocols\r\n" + \
             "Connection: Upgrade\r\n" + \
             "Sec-WebSocket-Accept: %s\r\n" + \
             "\r\n"
-
+file_recv_flag = 0
 HOST = ''
 PORT = 4500
 # client_count = 0
@@ -70,9 +70,40 @@ def new_client(conn, addr):
             unmasked_data = [masked_data[i] ^ mask_key[i%4] for i in range(len(masked_data))]
             data_from_client = str(bytearray(unmasked_data))
         print data_from_client
-        f = open("file.txt", 'r+')
-        f.write(data_from_client)
-        f.close()
+
+
+        if file_recv_flag == 1:
+            filename = data_from_client
+            print filename
+            f = open(filename,'wb')
+            while data_from_client:
+                f.write(data_from_client)
+                data_from_client = conn.recv(1024)
+                if not data_from_client:
+                    break
+                databyte = bytearray(data_from_client))
+                datalen = (0x7F & databyte[1])
+                if(datalen > 0):
+                    mask_key = databyte[2:6]
+                    masked_data = databyte[6:(6+datalen)]
+                    unmasked_data = [masked_data[i] ^ mask_key[i%4] for i in range(len(masked_data))]
+                    data_from_client = str(bytearray(unmasked_data))
+            f.close()
+
+
+        if data_from_client == 'filestart':
+            file_recv_flag  += 1
+
+        if data_from_client == 'fileend':
+            file_recv_flag  += 1
+
+        if file_recv_flag == 2:
+            print "file has received"
+
+
+        #f = open("file.txt", 'r+')
+        #f.write(data_from_client)
+        #f.close()
 
         encoded_data = encode_data(data_from_client)
         for con in clients_set:
