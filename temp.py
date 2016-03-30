@@ -11,7 +11,15 @@ HOST = ''
 PORT = 4500
 # client_count = 0
 clients_set = set()
+
 data_from_client = ''
+f = open("file.txt", 'r+')
+list_arr = f.readlines()
+for line in list_arr:
+    data_from_client += line + '\n'
+print 'Data from client: %s' % (data_from_client)
+f.close()
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 s.listen(5)
@@ -61,6 +69,9 @@ def new_client(conn, addr):
             unmasked_data = [masked_data[i] ^ mask_key[i%4] for i in range(len(masked_data))]
             data_from_client = str(bytearray(unmasked_data))
         print data_from_client
+        f = open("file.txt", 'r+')
+        f.write(data_from_client)
+        f.close()
 
         encoded_data = encode_data(data_from_client)
         for con in clients_set:
