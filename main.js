@@ -25,4 +25,15 @@ $(document).ready(function() {
         console.log('Server ' + e.data);
 	text.val(e.data);
     };
+
+    newFile = function() {
+	console.log('newfile function called');
+	var fileName = prompt("Enter file name","filename.txt");
+	if(fileName != null) {
+	    console.log(fileName);
+	    $.get("http://localhost:5000/file?postfile=" + fileName, function(results){
+		console.log(results);
+	    });
+	}
+    }
 });

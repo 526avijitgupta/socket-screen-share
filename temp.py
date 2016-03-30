@@ -24,6 +24,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 s.listen(5)
 # conn, addr = s.accept()         
+
 # print 'Connected by', addr
 
 def encode_data(data_to_encode):
