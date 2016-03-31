@@ -5,16 +5,13 @@ import socket
 import thread
 
 HOST = ''
-PORT = 4501
+PORT = 4502
 MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
 HSHAKE_RESP = "HTTP/1.1 101 Switching Protocols\r\n" + \
             "Upgrade: websocket\r\n" + \
             "Connection: Upgrade\r\n" + \
             "Sec-WebSocket-Accept: %s\r\n" + \
             "\r\n"
-
-clients_set = set()
-files_mapping = {}
 
 def fetch_txt_files():
     files_string = ''
@@ -58,24 +55,23 @@ def handle_client_handshake(conn):
     resp_data = HSHAKE_RESP % ((base64.b64encode(hashlib.sha1(key+MAGIC).digest()),))
     conn.send(resp_data)
 
+def send_to_client(data, conn):
+    try:
+        conn.sendall(data)
+    except:
+        print("error sending to a client")
+
 def send_file_string(conn):
     files_string = fetch_txt_files()
     if len(files_string) >= 1:
         print 'Sending.. ' + files_string
-        try:
-            conn.sendall(encode_data('Files_List: ' + files_string))
-        except:
-            print("error sending to a client")
+        send_to_client(encode_data('Files_List: ' + files_string), conn)
 
-def store_mapping_and_send_file_data(conn, data_from_client):
-    global files_mapping
+def store_mapping_and_send_file_data(conn, data_from_client, files_mapping):
     open_file_name = data_from_client
     files_mapping[conn] = open_file_name
     f = open(open_file_name, 'r+')
-    try:
-        conn.sendall(encode_data(''.join(f.readlines())))
-    except:
-        print 'error'
+    send_to_client(encode_data(''.join(f.readlines())), conn)
     f.close()
     return open_file_name
 
@@ -86,21 +82,14 @@ def save_to_file(data_from_client, open_file_name):
         f.write(data_from_client)
         f.close()
 
-def send_updated_file(data_from_client, open_file_name):
-    global clients_set
-    global files_mapping
+def send_updated_file(data_from_client, open_file_name, clients_set, files_mapping):
     encoded_data = encode_data(data_from_client)
     for con in clients_set:
         if files_mapping[con] == open_file_name:
             print 'OPEN_FILE_NAME ', open_file_name
-            try:
-                con.sendall(encoded_data)
-            except:
-                print("error sending to a client")
+            send_to_client(encoded_data, con)
 
-def new_client(conn, addr):
-    global clients_set
-
+def new_client(conn, addr, clients_set, files_mapping):
     clients_set.add(conn)
     handle_client_handshake(conn)
     send_file_string(conn)
@@ -112,14 +101,17 @@ def new_client(conn, addr):
         data_from_client = decode_data(data_recv)
 
         if ".txt" in data_from_client:
-            open_file_name = store_mapping_and_send_file_data(conn, data_from_client)
+            open_file_name = store_mapping_and_send_file_data(conn, data_from_client, files_mapping)
         else:
             save_to_file(data_from_client, open_file_name)
-            send_updated_file(data_from_client, open_file_name)
+            send_updated_file(data_from_client, open_file_name, clients_set, files_mapping)
 
 
 if __name__ == "__main__":
+    clients_set = set()
+    files_mapping = {}
     s = start_server(HOST, PORT)
+
     while 1:
         conn, addr = s.accept()
-        thread.start_new_thread(new_client, (conn, addr,))
+        thread.start_new_thread(new_client, (conn, addr, clients_set, files_mapping))
