@@ -1,4 +1,11 @@
-import socket,hashlib,base64,thread
+import socket,hashlib,base64,thread, os
+
+def fetch_txt_files():
+    files_string = ''
+    for file in os.listdir('/home/avijit/github/socket-screen-share'):
+        if file.endswith('.txt'):
+            files_string += file + ' '
+    return files_string
 
 MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
 HSHAKE_RESP = "HTTP/1.1 101 Switching Protocols\r\n" + \
@@ -9,22 +16,13 @@ HSHAKE_RESP = "HTTP/1.1 101 Switching Protocols\r\n" + \
 
 HOST = ''
 PORT = 4500
-# client_count = 0
 clients_set = set()
-
+files_string = fetch_txt_files()
 data_from_client = ''
-f = open("file.txt", 'r+')
-list_arr = f.readlines()
-for line in list_arr:
-    data_from_client += line + '\n'
-print 'Data from client: %s' % (data_from_client)
-f.close()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 s.listen(5)
-# conn, addr = s.accept()         
-# print 'Connected by', addr
 
 def encode_data(data_to_encode):
     resp = bytearray([0b10000001, len(data_to_encode)])
@@ -50,13 +48,15 @@ def new_client(conn, addr):
     key = headers['Sec-WebSocket-Key']
     resp_data = HSHAKE_RESP % ((base64.b64encode(hashlib.sha1(key+MAGIC).digest()),))
     conn.send(resp_data)
-    if len(data_from_client) >= 1:
-        # for con in clients_set:
-        encoded_data = encode_data(data_from_client)
+
+    if len(files_string) >= 1:
+        print 'Sending.. ' + files_string
+        encoded_files_string = encode_data('Files_List: ' + files_string)
         try:
-            conn.sendall(encoded_data)
+            conn.sendall(encoded_files_string)
         except:
             print("error sending to a client")
+
     while 1:
         data_recv = conn.recv(4096)
         if not data_recv:
