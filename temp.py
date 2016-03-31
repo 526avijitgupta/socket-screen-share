@@ -1,12 +1,7 @@
 import socket,hashlib,base64,thread, os
 
-def fetch_txt_files():
-    files_string = ''
-    for file in os.listdir('/home/avijit/github/socket-screen-share'):
-        if file.endswith('.txt'):
-            files_string += file + ' '
-    return files_string
-
+HOST = ''
+PORT = 4500
 MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
 HSHAKE_RESP = "HTTP/1.1 101 Switching Protocols\r\n" + \
             "Upgrade: websocket\r\n" + \
@@ -14,15 +9,12 @@ HSHAKE_RESP = "HTTP/1.1 101 Switching Protocols\r\n" + \
             "Sec-WebSocket-Accept: %s\r\n" + \
             "\r\n"
 
-HOST = ''
-PORT = 4500
-clients_set = set()
-files_string = fetch_txt_files()
-data_from_client = ''
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST, PORT))
-s.listen(5)
+def fetch_txt_files():
+    files_string = ''
+    for file in os.listdir('/home/avijit/github/socket-screen-share'):
+        if file.endswith('.txt'):
+            files_string += file + ' '
+    return files_string
 
 def encode_data(data_to_encode):
     resp = bytearray([0b10000001, len(data_to_encode)])
@@ -30,13 +22,23 @@ def encode_data(data_to_encode):
         resp.append(d)
     return resp
 
+
+clients_set = set()
+files_string = fetch_txt_files()
+files_mapping = {}
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((HOST, PORT))
+s.listen(5)
+
 def new_client(conn, addr):
     global clients_set
-    global data_from_client
+    global files_mapping
+
     clients_set.add(conn)
-    print len(clients_set)
-    print ' is the count'
-    print 'Connected by', addr
+    # print len(clients_set)
+    # print ' is the count'
+    # print 'Connected by', addr
     data = conn.recv(4096)
     headers = {}
     lines = data.splitlines()
@@ -71,7 +73,9 @@ def new_client(conn, addr):
         print data_from_client
 
         if ".txt" in data_from_client:
-            f = open(data_from_client, 'r+')
+            open_file_name = data_from_client
+            files_mapping[conn] = open_file_name
+            f = open(open_file_name, 'r+')
             try:
                 conn.sendall(encode_data(''.join(f.readlines())))
             except:
@@ -79,12 +83,20 @@ def new_client(conn, addr):
             f.close()
 
         else:
+            if open_file_name is not None:
+                print 'Writing to file name: ' + open_file_name
+                f = open(open_file_name, 'r+')
+                f.write(data_from_client)
+                f.close()
+
             encoded_data = encode_data(data_from_client)
             for con in clients_set:
-                try:
-                    con.sendall(encoded_data)
-                except:
-                    print("error sending to a client")
+                if files_mapping[con] == open_file_name:
+                    print 'OPEN_FILE_NAME ', open_file_name
+                    try:
+                        con.sendall(encoded_data)
+                    except:
+                        print("error sending to a client")
 
 while 1:
     conn, addr = s.accept()
