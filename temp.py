@@ -69,16 +69,22 @@ def new_client(conn, addr):
             unmasked_data = [masked_data[i] ^ mask_key[i%4] for i in range(len(masked_data))]
             data_from_client = str(bytearray(unmasked_data))
         print data_from_client
-        f = open("file.txt", 'r+')
-        f.write(data_from_client)
-        f.close()
 
-        encoded_data = encode_data(data_from_client)
-        for con in clients_set:
+        if ".txt" in data_from_client:
+            f = open(data_from_client, 'r+')
             try:
-                con.sendall(encoded_data)
+                conn.sendall(encode_data(''.join(f.readlines())))
             except:
-                print("error sending to a client")
+                print 'error'
+            f.close()
+
+        else:
+            encoded_data = encode_data(data_from_client)
+            for con in clients_set:
+                try:
+                    con.sendall(encoded_data)
+                except:
+                    print("error sending to a client")
 
 while 1:
     conn, addr = s.accept()

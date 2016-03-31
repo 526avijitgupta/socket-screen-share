@@ -29,6 +29,7 @@ $(document).ready(function() {
       value = value.replace('Files_List: ', '');
       var files_list = value.split(' ');
       console.log(files_list);
+
       files_list.forEach(function(file, index) {
         if (file !== '') {
           var btn = document.createElement('button');
@@ -36,7 +37,9 @@ $(document).ready(function() {
           var btnElem = $(btn);
           btnElem.addClass(file);
           btnElem.on('click', function() {
-            console.log(($(this).attr('class')));
+            var clickedFile = $(this).attr('class');
+            console.log(clickedFile);
+            s.send(clickedFile);
           });
           $('body').append(btnElem);
           console.log(btnElem);
