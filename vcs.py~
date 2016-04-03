@@ -1,0 +1,10 @@
+import difflib
+import modules.create_socket
+
+HOST = ''
+PORT = 9200
+
+if __name__ == "__main__":
+    s = start_server(HOST, PORT)
+    
+    

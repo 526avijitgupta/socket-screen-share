@@ -1,7 +1,7 @@
 import base64
 import hashlib
-import create_socket
 import os
+import socket
 import thread
 
 HOST = ''
@@ -19,6 +19,12 @@ def fetch_txt_files():
         if file.endswith('.txt'):
             files_string += file + ' '
     return files_string
+
+def start_server(host, port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((host, port))
+    s.listen(5)
+    return s
 
 def encode_data(data_to_encode):
     resp = bytearray([0b10000001, len(data_to_encode)])
@@ -104,7 +110,7 @@ def new_client(conn, addr, clients_set, files_mapping):
 if __name__ == "__main__":
     clients_set = set()
     files_mapping = {}
-    s = create_socket.start_server(HOST, PORT)
+    s = start_server(HOST, PORT)
 
     while 1:
         conn, addr = s.accept()

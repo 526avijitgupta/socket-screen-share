@@ -1,20 +1,38 @@
 $(document).ready(function() {
-  var PORT = 4502;
+  var PORT = 9201; // 4502;
   var s = new WebSocket("ws://localhost:" + PORT + "/");
   var text = $('#text');
   var isConSet = false;
+  var prevValue = '';
+  var currValue = '';
+  
   text.on('input', function() {
-    var value = text.val();
-    console.log(value);
+    currValue = text.val();
+
+  var dmp = new diff_match_patch();
+  var d = dmp.diff_main(prevValue, currValue);
+  var ds = dmp.diff_prettyHtml(d);
+    var patch_list = dmp.patch_make(prevValue, currValue, d);
+  patch_text = dmp.patch_toText(patch_list);
+  console.log('patch_text: ', patch_text);
+  s.send(patch_text);
+
+  // console.log('d: ', d);
+  // console.log('ds: ', ds);
+  $('#div').html(ds);
+    
+    // console.log(currValue);
     if (isConSet) {
       console.log('Sending Value');
-      s.send(value);
+    //  s.send(currValue);
     }
+    prevValue = currValue;
   });
 
   s.onopen = function() {
     console.log('Onload');
     isConSet = true;
+    // s.send('ABC');
   };
 
   s.onclose = function(error) {
@@ -48,6 +66,9 @@ $(document).ready(function() {
     } else {
       text.val(value);
     }
-
   };
+
+  $('.open-vcs-btn').on('click', function() {
+    
+  });
 });
