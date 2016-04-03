@@ -1,5 +1,5 @@
-import diff_match_patch as dmp_module
-import create_socket
+import modules.lib.diff_match_patch as dmp_module
+import modules.create_socket as create_socket
 import base64
 import hashlib
 
