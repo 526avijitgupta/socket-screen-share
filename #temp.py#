@@ -2,13 +2,13 @@ import socket,hashlib,base64,thread
 
 MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
 HSHAKE_RESP = "HTTP/1.1 101 Switching Protocols\r\n" + \
-            "Upgrade: websocket\r\n" + \
+            "Upgrade: WebSocket\r\n" + \
             "Connection: Upgrade\r\n" + \
             "Sec-WebSocket-Accept: %s\r\n" + \
             "\r\n"
 file_recv_flag = 0
 HOST = ''
-PORT = 4502
+PORT = 4500
 # client_count = 0
 clients_set = set()
 
@@ -41,7 +41,6 @@ def new_client(conn, addr):
     print len(clients_set)
     print ' is the count'
     print 'Connected by', addr
-
     data = conn.recv(4096)
     headers = {}
     lines = data.splitlines()
@@ -49,13 +48,10 @@ def new_client(conn, addr):
         parts = l.split(": ", 1)
         if len(parts) == 2:
             headers[parts[0]] = parts[1]
-    if len(lines):
-        headers['code'] = lines[len(lines) - 1]
-        if 'Sec-WebSocket-Key' in headers:
-            key = headers['Sec-WebSocket-Key']
-            resp_data = HSHAKE_RESP % ((base64.b64encode(hashlib.sha1(key+MAGIC).digest()),))
-            conn.send(resp_data)
-
+    headers['code'] = lines[len(lines) - 1]
+    key = headers['Sec-WebSocket-Key']
+    resp_data = HSHAKE_RESP % ((base64.b64encode(hashlib.sha1(key+MAGIC).digest()),))
+    conn.send(resp_data)
     if len(data_from_client) >= 1:
         # for con in clients_set:
         encoded_data = encode_data(data_from_client)
