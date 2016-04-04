@@ -1,6 +1,7 @@
 $(document).ready(function() {
-  var PORT = 9205; // 4502;
-  var s = new WebSocket("ws://localhost:" + PORT + "/");
+  var PORT = 4530; // 4502;
+  var SERVER_IP = "192.168.43.190";
+  var s = new WebSocket("ws://" + SERVER_IP + ":"  + PORT + "/");
   var text = $('#text');
   var isConSet = false;
   var prevValue = '';
@@ -9,22 +10,22 @@ $(document).ready(function() {
   text.on('input', function() {
     currValue = text.val();
 
-  var dmp = new diff_match_patch();
-  var d = dmp.diff_main(prevValue, currValue);
-  var ds = dmp.diff_prettyHtml(d);
-    var patch_list = dmp.patch_make(prevValue, currValue, d);
-  patch_text = dmp.patch_toText(patch_list);
-  console.log('patch_text: ', patch_text);
-  s.send(patch_text);
+  //var dmp = new diff_match_patch();
+  //var d = dmp.diff_main(prevValue, currValue);
+  //var ds = dmp.diff_prettyHtml(d);
+    //var patch_list = dmp.patch_make(prevValue, currValue, d);
+  //patch_text = dmp.patch_toText(patch_list);
+  //console.log('patch_text: ', patch_text);
+  ///s.send(patch_text);
 
   // console.log('d: ', d);
   // console.log('ds: ', ds);
-  $('#div').html(ds);
+  //$('#div').html(ds);
     
     // console.log(currValue);
     if (isConSet) {
-      console.log('Sending Value');
-    //  s.send(currValue);
+      console.log('Sending Value', currValue);
+      s.send(currValue);
     }
     prevValue = currValue;
   });
