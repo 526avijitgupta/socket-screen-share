@@ -7,11 +7,13 @@ import os
 import thread
 
 HOST = ''
-PORT = 4507
+PORT = 4530
+DATASTORE_PATH = '/home/avijit/github/socket-screen-share/server/datastore/'
+connected_ips_list = []
 
 def fetch_txt_files():
     files_string = ''
-    for file in os.listdir('/home/avijit/github/socket-screen-share/server/datastore/'):
+    for file in os.listdir(DATASTORE_PATH):
         if file.endswith('.txt'):
             files_string += file + ' '
     return files_string
@@ -37,7 +39,7 @@ def send_file_string(conn):
 def store_mapping_and_send_file_data(conn, data_from_client, files_mapping):
     open_file_name = data_from_client
     files_mapping[conn] = open_file_name
-    f = open(open_file_name, 'r+')
+    f = open(DATASTORE_PATH + open_file_name, 'r+')
     send_to_client(encode_data(''.join(f.readlines())), conn)
     f.close()
     return open_file_name
@@ -45,7 +47,7 @@ def store_mapping_and_send_file_data(conn, data_from_client, files_mapping):
 def save_to_file(data_from_client, open_file_name):
     if open_file_name is not None:
         print 'Writing to file name: ' + open_file_name
-        f = open(open_file_name, 'r+')
+        f = open(DATASTORE_PATH + open_file_name, 'r+')
         f.write(data_from_client)
         f.close()
 
@@ -81,4 +83,12 @@ if __name__ == "__main__":
 
     while 1:
         conn, addr = s.accept()
-        thread.start_new_thread(new_client, (conn, addr, clients_set, files_mapping))
+        if addr[0] not in connected_ips_list:
+            connected_ips_list.append(addr[0])
+            print 'Got new connection'
+            print conn
+            print addr
+            print 'NEW client connected'
+            thread.start_new_thread(new_client, (conn, addr, clients_set, files_mapping))
+        else:
+            print 'Same client already connected'

@@ -2,6 +2,7 @@ $(document).ready(function() {
   var PORT = 4530; // 4502;
   var SERVER_IP = "192.168.43.190";
   var s = new WebSocket("ws://" + SERVER_IP + ":"  + PORT + "/");
+
   var text = $('#text');
   var isConSet = false;
   var prevValue = '';
@@ -20,8 +21,12 @@ $(document).ready(function() {
 
   // console.log('d: ', d);
   // console.log('ds: ', ds);
+<<<<<<< HEAD
   //$('#div').html(ds);
     
+=======
+  $('#div').html(ds);
+>>>>>>> b6b63dd7688251e8b5ea656799ffadf5a9826e0c
     // console.log(currValue);
     if (isConSet) {
       console.log('Sending Value', currValue);
