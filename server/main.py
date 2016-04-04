@@ -1,59 +1,26 @@
 import base64
 import hashlib
+import modules.create_socket as create_socket
+import modules.decode_data as decode_data
+import modules.handle_client_handshake as handle_client_handshake
 import os
-import socket
 import thread
 
 HOST = ''
-PORT = 4502
-MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
-HSHAKE_RESP = "HTTP/1.1 101 Switching Protocols\r\n" + \
-            "Upgrade: websocket\r\n" + \
-            "Connection: Upgrade\r\n" + \
-            "Sec-WebSocket-Accept: %s\r\n" + \
-            "\r\n"
+PORT = 4507
 
 def fetch_txt_files():
     files_string = ''
-    for file in os.listdir('/home/avijit/github/socket-screen-share'):
+    for file in os.listdir('/home/avijit/github/socket-screen-share/server/datastore/'):
         if file.endswith('.txt'):
             files_string += file + ' '
     return files_string
-
-def start_server(host, port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((host, port))
-    s.listen(5)
-    return s
 
 def encode_data(data_to_encode):
     resp = bytearray([0b10000001, len(data_to_encode)])
     for d in bytearray(data_to_encode):
         resp.append(d)
     return resp
-
-def decode_data(data_to_decode):
-    databyte = bytearray(data_to_decode)
-    datalen = (0x7F & databyte[1])
-    if(datalen > 0):
-        mask_key = databyte[2:6]
-        masked_data = databyte[6:(6+datalen)]
-        unmasked_data = [masked_data[i] ^ mask_key[i%4] for i in range(len(masked_data))]
-        data_from_client = str(bytearray(unmasked_data))
-    return data_from_client or data_to_decode
-
-def handle_client_handshake(conn):
-    data = conn.recv(4096)
-    headers = {}
-    lines = data.splitlines()
-    for l in lines:
-        parts = l.split(": ", 1)
-        if len(parts) == 2:
-            headers[parts[0]] = parts[1]
-    headers['code'] = lines[len(lines) - 1]
-    key = headers['Sec-WebSocket-Key']
-    resp_data = HSHAKE_RESP % ((base64.b64encode(hashlib.sha1(key+MAGIC).digest()),))
-    conn.send(resp_data)
 
 def send_to_client(data, conn):
     try:
@@ -91,14 +58,14 @@ def send_updated_file(data_from_client, open_file_name, clients_set, files_mappi
 
 def new_client(conn, addr, clients_set, files_mapping):
     clients_set.add(conn)
-    handle_client_handshake(conn)
+    handle_client_handshake.handle_client_handshake(conn)
     send_file_string(conn)
 
     while 1:
         data_recv = conn.recv(4096)
         if not data_recv:
             break
-        data_from_client = decode_data(data_recv)
+        data_from_client = decode_data.decode_data(data_recv)
 
         if ".txt" in data_from_client:
             open_file_name = store_mapping_and_send_file_data(conn, data_from_client, files_mapping)
@@ -110,7 +77,7 @@ def new_client(conn, addr, clients_set, files_mapping):
 if __name__ == "__main__":
     clients_set = set()
     files_mapping = {}
-    s = start_server(HOST, PORT)
+    s = create_socket.start_server(HOST, PORT)
 
     while 1:
         conn, addr = s.accept()

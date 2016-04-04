@@ -1,11 +1,11 @@
 $(document).ready(function() {
-  var PORT = 9201; // 4502;
+  var PORT = 9205; // 4502;
   var s = new WebSocket("ws://localhost:" + PORT + "/");
   var text = $('#text');
   var isConSet = false;
   var prevValue = '';
   var currValue = '';
-  
+
   text.on('input', function() {
     currValue = text.val();
 
