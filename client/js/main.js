@@ -14,6 +14,7 @@ $(document).ready(function() {
   text.on('input', function() {
     currValue = text.val();
 
+
     //var dmp = new diff_match_patch();
     //var d = dmp.diff_main(prevValue, currValue);
     //var ds = dmp.diff_prettyHtml(d);
