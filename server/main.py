@@ -8,7 +8,7 @@ from time import sleep
 import thread
 
 HOST = ''
-PORT = 4536
+PORT = 4538
 DATASTORE_PATH = '/home/avijit/github/socket-screen-share/server/datastore/'
 connected_ips_list = []
 

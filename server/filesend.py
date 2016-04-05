@@ -3,6 +3,7 @@ import hashlib
 import modules.create_socket as create_socket
 import modules.decode_data as decode_data
 import modules.handle_client_handshake as handle_client_handshake
+import thread
 
 DATASTORE_PATH = '/home/avijit/github/socket-screen-share/client/files/'
 
@@ -28,19 +29,22 @@ def send_file(filename):
 HOST = ''
 PORT = 4510
 
+def new_client(conn):
+    handle_client_handshake.handle_client_handshake(conn)
+    while True:
+        file_name_recv = conn.recv(4096)
+        if file_name_recv:
+            decoded_data = decode_data.decode_data(file_name_recv)
+            # print decoded_data
+            file_name = decoded_data.replace('Create file:', '')
+            # print file_name
+            send_file(file_name)
+
+
 if __name__ == '__main__':
     s = create_socket.start_server(HOST, PORT)
+
     while True:
         conn, addr = s.accept()
-        handle_client_handshake.handle_client_handshake(conn)
-        print 'Handled handshake'
-        while True:
-            file_name_recv = conn.recv(4096)
-            if file_name_recv:
-                decoded_data = decode_data.decode_data(file_name_recv)
-                print decoded_data
-                file_name = decoded_data.replace('Create file:', '')
-                print file_name
-                send_file(file_name)
-                # break
+        thread.start_new_thread(new_client, (conn,))
 
