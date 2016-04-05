@@ -1,13 +1,41 @@
 <html>
     <head>
-        <title></title>
+        <title>vishal</title>
+        <style type="text/css">
+         body
+         {
+             background-color: #8E8EA9;
+
+         }
+         #text
+         {
+             margin-left: 200;
+             margin-top: 40;
+         }
+         #vcs
+         {
+             margin-left: 460;
+             margin-top: 8;
+         }
+         #create
+         {
+             margin-left: 14;
+             margin-top: 8;
+         }
+
+        </style>
     </head>
     <body>
         <script type="text/javascript" src="js/lib/jquery.js"></script>
-	<script type="text/javascript" src="js/lib/diff_match_patch.js"></script>
+        <script type="text/javascript" src="js/lib/diff_match_patch.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
-        <textarea cols="30" id="text" rows="10"></textarea>
-	<button class="open-vcs-btn">Version Control</button>
+        <div id="text">
+            <textarea cols="30" id="text" rows="10" style="margin: 40px 0px 0px 200px; height: 291px; width: 483px;">
+            </textarea>
+            <br>
+            <button class="open-vcs-btn" id="vcs">Version Control</button>
+            <button class="btn btn-success" id="create">Create File</button>
+        </div>
         <div id="div"></div>
     </body>
 </html>

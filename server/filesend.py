@@ -1,0 +1,45 @@
+import base64
+import hashlib
+import modules.create_socket as create_socket
+import modules.decode_data as decode_data
+import modules.handle_client_handshake as handle_client_handshake
+
+DATASTORE_PATH = '/home/avijit/github/socket-screen-share/client/files/'
+
+def send_file(filename):
+    f = open(DATASTORE_PATH + filename, 'w')
+    f.close()
+    f = open(DATASTORE_PATH + filename, 'r')
+    l = f.read(1024)
+    c = create_socket.start_client(HOST, 4512)
+    c.send(filename)
+
+    while True:
+       recv_flag =  c.recv(1024)
+       if recv_flag == '1':
+           break
+
+    while l:
+        c.send(l)
+        l = f.read(1024)
+    f.close()
+    c.close()
+
+HOST = ''
+PORT = 4507
+
+if __name__ == '__main__':
+    s = create_socket.start_server(HOST, PORT)
+    conn, addr = s.accept()
+    handle_client_handshake.handle_client_handshake(conn)
+    print 'Handled handshake'
+    while True:
+        file_name_recv = conn.recv(4096)
+        if file_name_recv:
+            decoded_data = decode_data.decode_data(file_name_recv)
+            print decoded_data
+            file_name = decoded_data.replace('Create file:', '')
+            print file_name
+            send_file(file_name)
+            break
+

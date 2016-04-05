@@ -7,7 +7,7 @@ import os
 import thread
 
 HOST = ''
-PORT = 4530
+PORT = 4531
 DATASTORE_PATH = '/home/avijit/github/socket-screen-share/server/datastore/'
 connected_ips_list = []
 
@@ -74,6 +74,13 @@ def new_client(conn, addr, clients_set, files_mapping):
         else:
             save_to_file(data_from_client, open_file_name)
             send_updated_file(data_from_client, open_file_name, clients_set, files_mapping)
+
+        # if "Create file: " in data_from_client:
+        #     file_name = data_from_client.replace('Create file: ', '')
+        #     client = socket.socket()
+        #     client.connect((HOST, '4501'))
+        #     # client.send
+        #     # s = create_socket
 
 
 if __name__ == "__main__":

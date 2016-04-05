@@ -1,7 +1,8 @@
 $(document).ready(function() {
-  var PORT = 4530; // 4502;
+  var PORT = 4531; // 4502;
   var SERVER_IP = "192.168.43.190";
   var s = new WebSocket("ws://" + SERVER_IP + ":"  + PORT + "/");
+  var fileNameServer = new WebSocket("ws://" + SERVER_IP + ":4507/");
 
   var text = $('#text');
   var isConSet = false;
@@ -11,22 +12,17 @@ $(document).ready(function() {
   text.on('input', function() {
     currValue = text.val();
 
-  //var dmp = new diff_match_patch();
-  //var d = dmp.diff_main(prevValue, currValue);
-  //var ds = dmp.diff_prettyHtml(d);
+    //var dmp = new diff_match_patch();
+    //var d = dmp.diff_main(prevValue, currValue);
+    //var ds = dmp.diff_prettyHtml(d);
     //var patch_list = dmp.patch_make(prevValue, currValue, d);
-  //patch_text = dmp.patch_toText(patch_list);
-  //console.log('patch_text: ', patch_text);
-  ///s.send(patch_text);
+    //patch_text = dmp.patch_toText(patch_list);
+    //console.log('patch_text: ', patch_text);
+    ///s.send(patch_text);
 
-  // console.log('d: ', d);
-  // console.log('ds: ', ds);
-<<<<<<< HEAD
-  //$('#div').html(ds);
-    
-=======
-  $('#div').html(ds);
->>>>>>> b6b63dd7688251e8b5ea656799ffadf5a9826e0c
+    // console.log('d: ', d);
+    // console.log('ds: ', ds);
+    //$('#div').html(ds);
     // console.log(currValue);
     if (isConSet) {
       console.log('Sending Value', currValue);
@@ -34,6 +30,20 @@ $(document).ready(function() {
     }
     prevValue = currValue;
   });
+
+  var create = $('#create');
+  create.on('click', function() {
+    var fileName = prompt('Enter the file name:');
+    // console.log('File NAme:', fileName);
+    console.log('Create file:', fileName);
+    if (fileName) {
+      fileNameServer.send('Create file:' + fileName);
+    }
+  });
+
+  fileNameServer.onopen = function() {
+    console.log('File handling server open');
+  };
 
   s.onopen = function() {
     console.log('Onload');
@@ -75,6 +85,6 @@ $(document).ready(function() {
   };
 
   $('.open-vcs-btn').on('click', function() {
-    
+
   });
 });
