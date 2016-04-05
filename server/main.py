@@ -45,8 +45,10 @@ def send_file_string(clients_list):
 
 def store_mapping_and_send_file_data(conn, data_from_client, files_mapping):
     open_file_name = data_from_client
+    print 'New file..........'
+    print 'Data from client: ' + data_from_client
     files_mapping[conn] = open_file_name
-    f = open(DATASTORE_PATH + open_file_name, 'r+')
+    f = open(DATASTORE_PATH + open_file_name, 'rb')
     send_to_client(encode_data(''.join(f.readlines())), conn)
     f.close()
     return open_file_name
