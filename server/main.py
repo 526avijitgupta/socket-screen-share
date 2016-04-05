@@ -4,10 +4,11 @@ import modules.create_socket as create_socket
 import modules.decode_data as decode_data
 import modules.handle_client_handshake as handle_client_handshake
 import os
+from time import sleep
 import thread
 
 HOST = ''
-PORT = 4531
+PORT = 4536
 DATASTORE_PATH = '/home/avijit/github/socket-screen-share/server/datastore/'
 connected_ips_list = []
 
@@ -30,11 +31,17 @@ def send_to_client(data, conn):
     except:
         print("error sending to a client")
 
-def send_file_string(conn):
-    files_string = fetch_txt_files()
-    if len(files_string) >= 1:
-        print 'Sending.. ' + files_string
-        send_to_client(encode_data('Files_List: ' + files_string), conn)
+def send_file_string(clients_list):
+    while 1:
+    # print 'Calling once'
+    # for i in range(0,5):
+        # print 'Sending %d time' % (i)
+        files_string = fetch_txt_files()
+        if len(files_string) >= 1:
+            for con in clients_set:
+                print 'Sending.. ' + files_string
+                send_to_client(encode_data('Files_List: ' + files_string), con)
+        sleep(3)
 
 def store_mapping_and_send_file_data(conn, data_from_client, files_mapping):
     open_file_name = data_from_client
@@ -61,9 +68,10 @@ def send_updated_file(data_from_client, open_file_name, clients_set, files_mappi
 def new_client(conn, addr, clients_set, files_mapping):
     clients_set.add(conn)
     handle_client_handshake.handle_client_handshake(conn)
-    send_file_string(conn)
+    thread.start_new_thread(send_file_string, (clients_set,))
 
     while 1:
+        print 'Calling file send'
         data_recv = conn.recv(4096)
         if not data_recv:
             break
@@ -74,13 +82,6 @@ def new_client(conn, addr, clients_set, files_mapping):
         else:
             save_to_file(data_from_client, open_file_name)
             send_updated_file(data_from_client, open_file_name, clients_set, files_mapping)
-
-        # if "Create file: " in data_from_client:
-        #     file_name = data_from_client.replace('Create file: ', '')
-        #     client = socket.socket()
-        #     client.connect((HOST, '4501'))
-        #     # client.send
-        #     # s = create_socket
 
 
 if __name__ == "__main__":

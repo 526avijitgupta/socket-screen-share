@@ -1,13 +1,14 @@
 $(document).ready(function() {
-  var PORT = 4531; // 4502;
+  var PORT = 4536; // 4502;
   var SERVER_IP = "192.168.43.190";
   var s = new WebSocket("ws://" + SERVER_IP + ":"  + PORT + "/");
-  var fileNameServer = new WebSocket("ws://" + SERVER_IP + ":4507/");
+  var fileNameServer = new WebSocket("ws://" + SERVER_IP + ":4510/");
 
   var text = $('#text');
   var isConSet = false;
   var prevValue = '';
   var currValue = '';
+  var filesString = '';
 
   text.on('input', function() {
     currValue = text.val();
@@ -60,25 +61,13 @@ $(document).ready(function() {
     console.log('Server ' + value);
 
     if (value.indexOf('Files_List: ') !== -1) {
-      value = value.replace('Files_List: ', '');
-      var files_list = value.split(' ');
-      console.log(files_list);
-
-      files_list.forEach(function(file, index) {
-        if (file !== '') {
-          var btn = document.createElement('button');
-          btn.textContent = file;
-          var btnElem = $(btn);
-          btnElem.addClass(file);
-          btnElem.on('click', function() {
-            var clickedFile = $(this).attr('class');
-            console.log(clickedFile);
-            s.send(clickedFile);
-          });
-          $('body').append(btnElem);
-          console.log(btnElem);
-        }
-      });
+      if (filesString !== value) {
+        filesString = value;
+        value = value.replace('Files_List: ', '');
+        var files_list = value.split(' ');
+        console.log(files_list);
+        createFileButtons(files_list);
+      }
     } else {
       text.val(value);
     }
@@ -88,3 +77,29 @@ $(document).ready(function() {
 
   });
 });
+
+function createFileButtons(files_list) {
+  removeAllFileButtons();
+
+  files_list.forEach(function(file, index) {
+    if (file !== '') {
+      var btn = document.createElement('button');
+      btn.textContent = file;
+      var btnElem = $(btn);
+      btnElem.addClass(file);
+      btnElem.on('click', function() {
+        var clickedFile = $(this).attr('class');
+        console.log(clickedFile);
+        s.send(clickedFile);
+      });
+      $('.file-buttons').append(btnElem);
+      console.log(btnElem);
+    }
+  });
+
+}
+
+function removeAllFileButtons() {
+  $('.file-buttons').empty();
+  // $('.file-button').each(function())
+}
