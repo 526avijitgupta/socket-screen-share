@@ -26,14 +26,51 @@
         </style>
     </head>
     <body>
+        <link rel="stylesheet" type="text/css" media="screen" href="js/jquery-spellchecker/src/css/jquery.spellchecker.css" />
         <script type="text/javascript" src="js/lib/jquery.js"></script>
         <script type="text/javascript" src="js/lib/diff_match_patch.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript" src="js/JavaScriptSpellCheck/include.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery-spellchecker/src/js/spellchecker.js"></script>
+        <!-- <script type="text/javascript">
+            // $('#text').spellAsYouType();
+            // $('#text').spellCheckInDialog();
+        </script> -->
+        <script type="text/javascript">
+
+
+        // Init the html spellchecker
+        var spellchecker = new $.SpellChecker('textarea', {
+        lang: 'en',
+        parser: 'html',
+        webservice: {
+        path: 'js/jquery-spellchecker/src/webservices/php/SpellChecker.php',
+        driver: 'PSpell'
+        },
+        suggestBox: {
+        position: 'below'
+        }
+        });
+
+        // Bind spellchecker handler functions
+        spellchecker.on('check.success', function() {
+        alert('There are no incorrectly spelt words!');
+        });
+
+        // Check the spelling
+        $('#check-textarea').click(function(e){
+            console.log("hello");
+            spellchecker.check();
+        });
+        </script>
         <div id="text-wrap">
-            <textarea cols="30" id="text" rows="10" style="margin: 40px 0px 0px 200px; height: 291px; width: 483px;">
-            </textarea>
+            <!-- <textarea  name = "text" spellcheck="true" cols="30" id="text" rows="10" style="margin: 40px 0px 0px 200px; height: 291px; width: 483px;">
+            </textarea> -->
+            <div contenteditable="true"  name = "text" spellcheck="true" cols="30" id="text" rows="10" style="margin: 40px 0px 0px 200px; height: 291px; width: 483px;">
+            </div>
             <br>
-            <button class="open-vcs-btn" id="vcs">Version Control</button>
+            <button id="check-textarea">Check Spelling</button>
             <button class="btn btn-success" id="create">Create File</button>
         </div>
         <div class="file-buttons"></div>

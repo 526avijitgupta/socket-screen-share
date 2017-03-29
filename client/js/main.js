@@ -1,7 +1,7 @@
 $(document).ready(function() {
-  var PORT = 4538; // 4502;
-  var FILES_PORT = 4510;
-  var SERVER_IP = "192.168.43.190";
+  var PORT = 4540; // 4502;
+  var FILES_PORT = 4511;
+  var SERVER_IP = "localhost";
   var s = new WebSocket("ws://" + SERVER_IP + ":"  + PORT + "/");
   var fileNameServer = new WebSocket("ws://" + SERVER_IP + ":" + FILES_PORT + "/");
 
@@ -11,9 +11,16 @@ $(document).ready(function() {
   var currValue = '';
   var filesString = '';
 
-  text.on('input', function() {
-    currValue = text.val();
+  $(document).ready(function(){
 
+  });
+  text.on('input', function() {
+    console.log("typing")
+    currValue = text.val();
+    // o = $Spelling.AjaxSpellCheck(currValue);
+    // o.onSpellCheck = function(result,suggestions){
+    //   alert("SpellChecking Result: " + result);
+    // }
 
     //var dmp = new diff_match_patch();
     //var d = dmp.diff_main(prevValue, currValue);
@@ -57,6 +64,7 @@ $(document).ready(function() {
 
   s.onclose = function(error) {
     console.log('Websocket error ' + error);
+    s.send("connection closed");
   };
 
   s.onmessage = function(e) {
@@ -73,7 +81,7 @@ $(document).ready(function() {
         $('.file-buttons').empty();
 
         files_list.forEach(function(file, index) {
-          if (file !== '') {
+          if (file !== 'empty') {
             var btn = document.createElement('button');
             btn.textContent = file;
             var btnElem = $(btn);
@@ -85,6 +93,8 @@ $(document).ready(function() {
             });
             $('.file-buttons').append(btnElem);
             console.log(btnElem);
+          }else{
+            $('.file-buttons').empty();
           }
         });
       }

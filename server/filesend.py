@@ -5,14 +5,14 @@ import modules.decode_data as decode_data
 import modules.handle_client_handshake as handle_client_handshake
 import thread
 
-DATASTORE_PATH = '/home/avijit/github/socket-screen-share/client/files/'
+DATASTORE_PATH = '/home/vishal/Desktop/socket-screen-share/client/files/'
 
 def send_file(filename):
     f = open(DATASTORE_PATH + filename, 'w')
     f.close()
     f = open(DATASTORE_PATH + filename, 'r')
     l = f.read(1024)
-    c = create_socket.start_client(HOST, 4512)
+    c = create_socket.start_client(HOST, 4513)
     c.send(filename)
 
     while True:
@@ -27,7 +27,7 @@ def send_file(filename):
     c.close()
 
 HOST = ''
-PORT = 4510
+PORT = 4511
 
 def new_client(conn):
     handle_client_handshake.handle_client_handshake(conn)

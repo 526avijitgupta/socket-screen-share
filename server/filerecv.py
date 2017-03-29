@@ -4,7 +4,7 @@ import modules.create_socket as create_socket
 import modules.decode_data as decode_data
 import thread
 
-DATASTORE_PATH = '/home/avijit/github/socket-screen-share/server/datastore/'
+DATASTORE_PATH = '/home/vishal/Desktop/socket-screen-share/server/datastore/'
 
 def recv_file(conn):
     data_recv = conn.recv(1024)
@@ -21,7 +21,7 @@ def recv_file(conn):
                 break
 
 HOST = ''
-PORT = 4512
+PORT = 4513
 
 if __name__ == '__main__':
     s = create_socket.start_server(HOST, PORT)
