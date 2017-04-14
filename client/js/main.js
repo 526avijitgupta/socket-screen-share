@@ -5,41 +5,24 @@ $(document).ready(function() {
   var s = new WebSocket("ws://" + SERVER_IP + ":"  + PORT + "/");
   var fileNameServer = new WebSocket("ws://" + SERVER_IP + ":" + FILES_PORT + "/");
 
-  var text = $('#text');
+  // var text = $('#textEditor');
   var isConSet = false;
   var prevValue = '';
   var currValue = '';
   var filesString = '';
 
   $(document).ready(function(){
+        $('body', $('#textEditor').contents()).on('input', function(e) {
+    // alert('testing');
+          console.log("typing")
+          currValue = $("#textEditor").contents().find("body").html();
+          if (isConSet) {
+            console.log('Sending Value', currValue);
+            s.send(currValue);
+          }
+          prevValue = currValue;
+        });
 
-  });
-  text.on('input', function() {
-    console.log("typing")
-    currValue = text.val();
-    // o = $Spelling.AjaxSpellCheck(currValue);
-    // o.onSpellCheck = function(result,suggestions){
-    //   alert("SpellChecking Result: " + result);
-    // }
-
-    //var dmp = new diff_match_patch();
-    //var d = dmp.diff_main(prevValue, currValue);
-    //var ds = dmp.diff_prettyHtml(d);
-    //var patch_list = dmp.patch_make(prevValue, currValue, d);
-    //patch_text = dmp.patch_toText(patch_list);
-    //console.log('patch_text: ', patch_text);
-    ///s.send(patch_text);
-
-    // console.log('d: ', d);
-    // console.log('ds: ', ds);
-    //$('#div').html(ds);
-    // console.log(currValue);
-
-    if (isConSet) {
-      console.log('Sending Value', currValue);
-      s.send(currValue);
-    }
-    prevValue = currValue;
   });
 
   var create = $('#create');
@@ -100,7 +83,10 @@ $(document).ready(function() {
       }
     } else {
       console.log('Sending to textareaL: ', value);
-      text.val(value);
+      // text.html(value);
+      // document.getElementById("textEditor").contentWindow.document.body.innerHTML = value;
+      // $("#textEditor").contents().find("body").html("");
+      $("#textEditor").contents().find("body").html(value);
     }
   };
 

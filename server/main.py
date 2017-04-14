@@ -10,8 +10,6 @@ from filelock import FileLock
 import io
 import sys
 
-reload(sys)
-sys.setdefaultencoding('utf8')
 HOST = ''
 PORT = 4540
 DATASTORE_PATH = '/home/vishal/Desktop/socket-screen-share/server/datastore/'
@@ -47,7 +45,7 @@ def send_file_string(conn,clients_set,files_mapping):
         # print 'Sending %d time' % (i)
         files_string = fetch_txt_files()
         if len(files_string) >= 1:
-            print 'Sending.. ' + files_string
+            # print 'Sending.. ' + files_string
             list_flag = send_to_client(encode_data('Files_List: ' + files_string), conn)
             if list_flag == 0:
                 if conn in clients_set:
@@ -56,7 +54,7 @@ def send_file_string(conn,clients_set,files_mapping):
                     conn.close()
                 break
         else:
-            print 'Sending.. ' + files_string
+            # print 'Sending.. ' + files_string
             list_flag = send_to_client(encode_data('Files_List: empty'), conn)
             if list_flag == 0:
                 if conn in clients_set:
@@ -106,6 +104,7 @@ def new_client(conn, addr, clients_set, files_mapping):
     while 1:
         print 'Calling file send'
         data_recv = conn.recv(4096)
+        print "data received: " + data_recv
         if not data_recv:
             print "connection closing"
             clients_set.remove(conn)
@@ -114,6 +113,8 @@ def new_client(conn, addr, clients_set, files_mapping):
             conn.close()
             break
         data_from_client = decode_data.decode_data(data_recv)
+        # data_from_client = data_recv.decode('utf-8', 'ignore')
+        print "decoded data: " + data_from_client
         # data_from_client = b""+data_recv.decode("utf-8")
         if "connection closed" in data_from_client:
             print "connection closed"
