@@ -9,6 +9,7 @@ import thread
 from filelock import FileLock
 import io
 import sys
+import chardet
 
 HOST = ''
 PORT = 4540
@@ -23,6 +24,7 @@ def fetch_txt_files():
     return files_string
 
 def encode_data(data_to_encode):
+    # print chardet.detect(data_to_encode)
     resp = bytearray([0b10000001, len(data_to_encode)])
     for d in bytearray(data_to_encode):
         resp.append(d)
@@ -70,6 +72,7 @@ def store_mapping_and_send_file_data(conn, data_from_client, files_mapping):
     print 'New file..........'
     print 'Data from client: ' + data_from_client
     files_mapping[conn] = open_file_name
+    # print chardet.detect(open(DATASTORE_PATH + open_file_name, "rb").read())
     f = open(DATASTORE_PATH + open_file_name, 'rb')
     send_to_client(encode_data(''.join(f.readlines())), conn)
     f.close()
@@ -89,12 +92,13 @@ def save_to_file(data_from_client, open_file_name):
             lock.release()
 
 
-def send_updated_file(data_from_client, open_file_name, clients_set, files_mapping):
+def send_updated_file(data_from_client, open_file_name, clients_set, files_mapping, recv_conn):
     encoded_data = encode_data(data_from_client)
     for con in clients_set:
-        if files_mapping[con] == open_file_name:
-            print 'OPEN_FILE_NAME ', open_file_name
-            send_to_client(encoded_data, con)
+    	if con != recv_conn:
+	        if files_mapping[con] == open_file_name:
+	            print 'OPEN_FILE_NAME ', open_file_name
+	            send_to_client(encoded_data, con)
 
 def new_client(conn, addr, clients_set, files_mapping):
     clients_set.add(conn)
@@ -104,7 +108,8 @@ def new_client(conn, addr, clients_set, files_mapping):
     while 1:
         print 'Calling file send'
         data_recv = conn.recv(4096)
-        print "data received: " + data_recv
+        recv_conn = conn
+        # print "data received: " + data_recv
         if not data_recv:
             print "connection closing"
             clients_set.remove(conn)
@@ -127,7 +132,7 @@ def new_client(conn, addr, clients_set, files_mapping):
             open_file_name = store_mapping_and_send_file_data(conn, data_from_client, files_mapping)
         else:
             save_to_file(data_from_client, open_file_name)
-            send_updated_file(data_from_client, open_file_name, clients_set, files_mapping)
+            send_updated_file(data_from_client, open_file_name, clients_set, files_mapping, recv_conn)
     thread.exit()
 
 

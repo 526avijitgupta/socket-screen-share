@@ -7,7 +7,12 @@ def decode_data(data_to_decode):
         masked_data = databyte[6:(6+datalen)]
         unmasked_data = [masked_data[i] ^ mask_key[i%4] for i in range(len(masked_data))]
         data_from_client = str(bytearray(unmasked_data))
-    return data_from_client
+    # try:
+    #     data_from_client.decode('utf-8')
+    #     print "string is UTF-8, length %d bytes" % len(data_from_client)
+    # except UnicodeError:
+    #     print "string is not UTF-8"
+    return data_from_client.encode("ascii","ignore")
 
 # def decode_data(stringStreamIn):
 
